@@ -40,15 +40,11 @@ set_dimension!(m, :other_ghg, other_ghg_names) # FAIR dims - Set index for Kyoto
 set_dimension!(m, :ozone_depleting_substances, ods_names) # FAIR dims - Set index for Kyoto and ozone ozone-depleting gases.
 
 # expand the time dimension of the model to match the full extent of FAIR and 
-# explicitly the `first` attribute for the MimiFUND components
 set_dimension!(m, :time, collect(FAIR_first:FAIR_last))
-for comp in FUND_comp_names
-    Mimi.set_firstlast!(m, comp, first = FUND_first)
-end
 
 # add the MimiFAIR components to the MimiFUND model after the emissions 
 # component, noting they will take the first and last of the model which is now
-# FUND_first and FUND_last
+# FAIR_first and FAIR_last
 add_comp!(m, ch4_cycle; after = :emissions);
 add_comp!(m, n2o_cycle; after = :ch4_cycle);
 add_comp!(m, other_ghg_cycles; after = :n2o_cycle);
@@ -67,11 +63,8 @@ add_comp!(m, contrails_rf; after = :landuse_rf);
 add_comp!(m, total_rf; after = :contrails_rf);
 add_comp!(m, temperature; after = :total_rf);
 
-# update the FUND component parameters with padded versions
-update_MimiFUND_params!(m)
-
 # set all the FAIR component parameters and make their internal connections
-
+set_MimiFAIR_params!(m)
 
 # connect FUND and FAIR
 
