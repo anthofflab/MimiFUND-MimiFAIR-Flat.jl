@@ -7,11 +7,11 @@ import Mimi: @allow_missing
 
 @defcomp multiplier begin
 
-    multiplier  = Parameter()
+    multiply  = Parameter(index=[time])
     input       = Parameter(index=[time])
     output      = Variable(index=[time])
 
     function run_timestep(p, v, d, t)
-        v.output[t] = @allow_missing(p.input[t]) * p.multiplier
+        v.output[t] = @allow_missing(p.input[t]) * p.multiply[t]
     end
 end

@@ -6,12 +6,15 @@ include("helper.jl")
 include("multiplier.jl") # helper unit-conversion component
 
 # set some constants
+rcp = "RCP85"
+
 FAIR_first = 1765
 FAIR_last = 2500
+FAIR_len = length(FAIR_first:FAIR_last)
+
 FUND_first = 1950
 FUND_last = 2500
-
-rcp = "RCP85"
+FUND_len = length(FUND_first:FUND_last)
 
 # start with default MimiFUND model
 m = MimiFUND.get_model()
@@ -35,8 +38,7 @@ set_dimension!(m, :time, collect(FAIR_first:FAIR_last))
 # add the MimiFAIR components to the MimiFUND model after the emissions 
 # component, noting they will take the first and last of the model which is now
 # FAIR_first and FAIR_last
-add_comp!(m, multiplier; after = :emissions, first = FUND_first, last = FUND_last); # only needs to run when FUND has emissions
-add_comp!(m, ch4_cycle; after = :multiplier);
+add_comp!(m, ch4_cycle; after = :emissions);
 add_comp!(m, n2o_cycle; after = :ch4_cycle);
 add_comp!(m, other_ghg_cycles; after = :n2o_cycle);
 add_comp!(m, co2_cycle; after = :other_ghg_cycles);
@@ -65,8 +67,9 @@ set_MimiFAIR_params!(m)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIR.load_fair_data(FAIR_first, FAIR_last, rcp);
 FAIR_CO₂_backup = (rcp_emissions.FossilCO2 .+ rcp_emissions.OtherCO2)
+add_comp!(m, multiplier; after = :emissions, first = FUND_first, last = FUND_last);
+set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
 
-set_param!(m, :multiplier, :multiplier, 1/1000) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 connect_param!(m, :co2_cycle, :E_CO₂, :multiplier, :output, FAIR_CO₂_backup, backup_offset = 1)
 
