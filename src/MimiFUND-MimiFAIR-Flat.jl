@@ -3,7 +3,6 @@ using MimiFUND
 using Mimi
 
 include("helper.jl")
-include("multiplier.jl") # helper unit-conversion component
 
 # set some constants
 rcp = "RCP85"
@@ -24,8 +23,8 @@ import MimiFAIR: ch4_cycle, n2o_cycle, other_ghg_cycles, co2_cycle, ch4_rf,
     n2o_rf, other_ghg_rf, co2_rf, trop_o3_rf, strat_o3_rf, aerosol_direct_rf, 
     aerosol_indirect_rf, bc_snow_rf, landuse_rf, contrails_rf, total_rf, temperature 
 
-# add new dimensions relevant to FAIR (1) regions (2) minor greenhouse gases and 
-# (3) ozone-depleting substances
+# add new dimensions relevant to FAIR (1) minor greenhouse gases and 
+# (2) ozone-depleting substances
 other_ghg_names = ["CF4", "C2F6", "C6F14", "HFC23", "HFC32", "HFC43_10", "HFC125", "HFC134a", "HFC143a", "HFC227ea", "HFC245fa", "SF6", "CFC_11", "CFC_12", "CFC_113", "CFC_114", "CFC_115", "CARB_TET", "MCF", "HCFC_22", "HCFC_141B", "HCFC_142B", "HALON1211", "HALON1202", "HALON1301", "HALON2402", "CH3BR", "CH3CL"]
 ods_names = ["CFC_11", "CFC_12", "CFC_113", "CFC_114", "CFC_115", "CARB_TET", "MCF", "HCFC_22", "HCFC_141B", "HCFC_142B", "HALON1211", "HALON1202", "HALON1301", "HALON2402", "CH3BR", "CH3CL"]
 
@@ -61,17 +60,25 @@ set_MimiFAIR_params!(m)
 
 # connect FUND and FAIR
 
-# destination: FAIR component :co2_cycle --> parameter :E_CO₂
+#
+# FUND Emissions --> Convert Mtons to Gtons --> FAIR CO₂ Cycle 
+#
+
+# destination: FAIR component :co2_cycle parameter :E_CO₂
 # previous source: exogenous parameter
-# new source: FUND :emissions --> variable :mco2 (which then runs through the multiplier component)
+# new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
+
+add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
+set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
+connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIR.load_fair_data(FAIR_first, FAIR_last, rcp);
 FAIR_CO₂_backup = (rcp_emissions.FossilCO2 .+ rcp_emissions.OtherCO2)
-add_comp!(m, multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
-
-connect_param!(m, :multiplier, :input, :emissions, :mco2)
 connect_param!(m, :co2_cycle, :E_CO₂, :multiplier, :output, FAIR_CO₂_backup, backup_offset = 1)
+
+#
+# FAIR Temperature --> FUND CO₂ Cycle, Biodiversity, Ocean and Regional Climate Components
+#
 
 # destination: FUND components :climateco2cycle, :biodiversity, :ocean --> parameter :temp
 # previous source: FUND component :climatedynamics --> variable :temp

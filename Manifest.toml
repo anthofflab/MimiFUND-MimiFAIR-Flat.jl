@@ -428,7 +428,7 @@ version = "0.6.7"
 
 [[Mimi]]
 deps = ["CSVFiles", "Classes", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "Electron", "FileIO", "FilePaths", "GlobalSensitivityAnalysis", "GraphPlot", "IterTools", "IteratorInterfaceExtensions", "JSON", "LightGraphs", "LinearAlgebra", "Logging", "MacroTools", "MetaGraphs", "NamedArrays", "Pkg", "ProgressMeter", "Random", "Serialization", "Statistics", "StatsBase", "StringBuilders", "TableTraits", "VegaLite"]
-git-tree-sha1 = "e50ce67393cb00f8146c0f16bf9defeec67b1a32"
+git-tree-sha1 = "39ebb302e6265a4112d7029815665f02f99590d2"
 repo-rev = "master"
 repo-url = "https://github.com/mimiframework/Mimi.jl.git"
 uuid = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
