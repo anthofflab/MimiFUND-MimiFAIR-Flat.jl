@@ -481,9 +481,9 @@ version = "0.6.7"
 
 [[Mimi]]
 deps = ["CSVFiles", "Classes", "DataFrames", "DataStructures", "Dates", "DelimitedFiles", "Distributions", "Electron", "FileIO", "FilePaths", "GlobalSensitivityAnalysis", "GraphPlot", "IterTools", "IteratorInterfaceExtensions", "JSON", "LightGraphs", "LinearAlgebra", "Logging", "MacroTools", "MetaGraphs", "NamedArrays", "Pkg", "ProgressMeter", "Random", "Serialization", "Statistics", "StatsBase", "StringBuilders", "TableTraits", "VegaLite"]
-git-tree-sha1 = "78de61b07fdc5a5bd992154a8a1bc48fb1cef7b5"
+path = "/Users/lisarennels/.julia/dev/Mimi"
 uuid = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
-version = "1.2.2"
+version = "1.2.4-DEV"
 
 [[MimiFAIR]]
 deps = ["CSVFiles", "DataFrames", "Mimi", "NLsolve"]
@@ -493,9 +493,11 @@ version = "1.0.1"
 
 [[MimiFUND]]
 deps = ["Dates", "DelimitedFiles", "Distributions", "Mimi", "Random", "StatsBase"]
-git-tree-sha1 = "2c0e17a8d1b8aba2f9bf27acc5efb029baf092d0"
+git-tree-sha1 = "9ded9f4a912a182ae05cdefaf317defebcbd77f6"
+repo-rev = "mcs"
+repo-url = "https://github.com/fund-model/MimiFUND.jl.git"
 uuid = "b3ba11de-429f-11e9-29f7-cb478ab96e7c"
-version = "3.12.1"
+version = "3.12.2-DEV"
 
 [[Missings]]
 deps = ["DataAPI"]
