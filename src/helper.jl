@@ -55,7 +55,7 @@ function update_MimiFAIR_params!(m; rcp_scenario::String="RCP85", start_year::In
 
     # ---- Other Well-Mixed Greenhouse Gas Cycles ---- #
     update_param!(m, :other_ghg_cycles, :τ_other_ghg, gas_data[findall((in)(other_ghg_names), gas_data.gas), :lifetimes])    
-    update_param!(m, :other_ghg_cycles, :emiss_other_ghg, convert(Matrix, rcp_emissions[!,Symbol.(other_ghg_names)]))
+    update_param!(m, :other_ghg_cycles, :emiss_other_ghg, Matrix(rcp_emissions[!,Symbol.(other_ghg_names)]))
     update_param!(m, :other_ghg_cycles, :emiss2conc_other_ghg, conversions[findall((in)(other_ghg_names), conversions.gases), :emiss2conc])
 
     # ---- Methane Radiative Forcing ---- #
