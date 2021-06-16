@@ -55,8 +55,8 @@ add_comp!(m, contrails_rf; after = :landuse_rf);
 add_comp!(m, total_rf; after = :contrails_rf);
 add_comp!(m, temperature; after = :total_rf);
 
-# set all the FAIR component parameters and make their internal connections
-set_MimiFAIR_params!(m)
+# update all the FAIR component parameters and make their internal connections
+update_MimiFAIR_params!(m)
 
 # connect FUND and FAIR
 
@@ -69,7 +69,7 @@ set_MimiFAIR_params!(m)
 # new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
 
 add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
+update_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIR.load_fair_data(FAIR_first, FAIR_last, rcp);
