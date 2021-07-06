@@ -98,3 +98,5 @@ connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 
 run(m)
 explore(m)
+
+## SEE NOTEBOOK FOR SOME MORE GRAPHICS AND QC WORK
