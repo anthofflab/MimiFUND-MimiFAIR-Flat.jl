@@ -10,10 +10,10 @@ using Mimi
 include("src/helper.jl")
 
 # set some constants
-rcp = "RCP85"
+ar6 = "ssp245"
 
-FAIR_first = 1765
-FAIR_last = 2500
+FAIR_first = 1750
+FAIR_last = 2300
 FAIR_len = length(FAIR_first:FAIR_last)
 
 FUND_first = 1950
@@ -28,7 +28,7 @@ pulse_size = 1e7
 m = MimiFUND.get_model()
 
 # import MimiFAIR components 
-import MimiFAIR: ch4_cycle, n2o_cycle, other_ghg_cycles, co2_cycle, ch4_rf, 
+import MimiFAIRv1_6_2: ch4_cycle, n2o_cycle, other_ghg_cycles, co2_cycle, ch4_rf, 
     n2o_rf, other_ghg_rf, co2_rf, trop_o3_rf, strat_o3_rf, aerosol_direct_rf, 
     aerosol_indirect_rf, bc_snow_rf, landuse_rf, contrails_rf, total_rf, temperature 
 
@@ -130,7 +130,7 @@ end
 add_comp!(mm.modified, emissionspulse, after = :emissions)
 nyears = length(Mimi.time_labels(m))
 addem = zeros(nyears) 
-baseyear = 1765
+baseyear = 1750
 # if year != nothing 
 #     # pulse is spread over ten years, and emissions components is in Mt so divide by 1e7, and convert from CO2 to C if gas==:CO2 because emissions component is in MtC
     addem[(year - baseyear + 1):(year - baseyear + 1) + 9] .= pulse_size / 1e7 * (gas == :CO2 ? 12/44 : 1)
@@ -175,8 +175,8 @@ marginaldamage = mm[:impactaggregation, :loss]
 # marginaldamage = mm.modified[:impactaggregation, :loss] - mm.base[:impactaggregation, :loss]
 
 # calculate discount factors
-prtp = 0.05
-new_years = collect(1765:1:2500)
+prtp = 0.03
+new_years = collect(1750:1:2300)
 year_index = findfirst(isequal(year), new_years)
 
 df = zeros(length(new_years), 16)
@@ -193,7 +193,7 @@ scc = sum(skipmissing(marginaldamage .* df))
 ## compare with FUND SCC
 mfund = MimiFUND.get_model()
 run(mfund)
-scc_fund = MimiFUND.compute_scco2(mfund, year = 2030, eta = 0., prtp = 0.05, equity_weights = false) #...wut
+scc_fund = MimiFUND.compute_scco2(mfund, year = 2030, eta = 0., prtp = prtp, equity_weights = false) #...wut
 
 
 #-------------------------------------------------------

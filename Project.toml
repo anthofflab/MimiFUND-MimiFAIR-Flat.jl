@@ -2,7 +2,7 @@
 CSVFiles = "5d742f6a-9f54-50ce-8119-2520741973ca"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Mimi = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
-MimiFAIR = "73d86c50-c5fa-11e9-3497-c3dc913e627a"
+MimiFAIRv1_6_2 = "02cc1f66-ff46-4bd7-a247-ac068822e639"
 MimiFUND = "b3ba11de-429f-11e9-29f7-cb478ab96e7c"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 VegaLite = "112f6efa-9a02-5b7d-90c0-432ed331239a"
