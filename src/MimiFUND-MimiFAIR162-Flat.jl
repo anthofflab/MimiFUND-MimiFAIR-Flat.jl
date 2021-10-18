@@ -2,8 +2,7 @@ using MimiFAIRv1_6_2
 using MimiFUND
 using Mimi
 
-include("helper.jl")
-# include("src/helper.jl")
+include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
 
 # set some constants
 ar6_scenario = "ssp245"
