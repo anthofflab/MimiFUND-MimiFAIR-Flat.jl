@@ -685,6 +685,14 @@ git-tree-sha1 = "cffe999a141cec038f3ef5843b2fd6777f4f543d"
 uuid = "73d86c50-c5fa-11e9-3497-c3dc913e627a"
 version = "1.0.2"
 
+[[MimiFAIRv1_6_2]]
+deps = ["CSVFiles", "DataFrames", "JSON", "Mimi"]
+git-tree-sha1 = "dce205d064c8e5d2900a9bb738934f243e4f9958"
+repo-rev = "main"
+repo-url = "https://github.com/FrankErrickson/MimiFAIRv1_6_2.jl.git"
+uuid = "02cc1f66-ff46-4bd7-a247-ac068822e639"
+version = "0.1.0"
+
 [[MimiFUND]]
 deps = ["Dates", "DelimitedFiles", "Distributions", "Mimi", "Random", "StatsBase"]
 git-tree-sha1 = "fdb9488178841c530ae1b3f2a6a7e35fb685fb58"
