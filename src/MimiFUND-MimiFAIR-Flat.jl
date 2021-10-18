@@ -7,28 +7,6 @@ include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
 # set some constants
 rcp = "RCP85"
 
-# graph temperature
-fairvals = mfair[:temperature, :T]
-fundfairvals =  m[:temperature, :T]
-fundvals = vcat(
-    fill(missing, length(FAIR_first:FUND_first)-1),
-    mfund[:climateco2cycle, :temp][1:length(FUND_first:FAIR_last),:]
-)
-fundvals = fundvals[:,1]; # make a vector
-
-DataFrame(
-    :Year => Mimi.time_labels(m),
-    :FUND => fundvals,
-    :FAIR => fairvals,
-    :FUNDFAIR => fundfairvals) |> 
-    i -> stack(i, [:FUND, :FAIR, :FUNDFAIR]) |> # use an anonymouse function to be tricky
-    @vlplot(
-        :line, 
-        x = :Year,
-        y = :value,
-        color = :variable
-    )
-
 FAIR_first = 1765
 FAIR_last = 2500
 FAIR_len = length(FAIR_first:FAIR_last)
@@ -120,5 +98,27 @@ connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 
 run(m)
 explore(m)
+
+# graph temperature
+fairvals = mfair[:temperature, :T]
+fundfairvals =  m[:temperature, :T]
+fundvals = vcat(
+    fill(missing, length(FAIR_first:FUND_first)-1),
+    mfund[:climateco2cycle, :temp][1:length(FUND_first:FAIR_last),:]
+)
+fundvals = fundvals[:,1]; # make a vector
+
+DataFrame(
+    :Year => Mimi.time_labels(m),
+    :FUND => fundvals,
+    :FAIR => fairvals,
+    :FUNDFAIR => fundfairvals) |> 
+    i -> stack(i, [:FUND, :FAIR, :FUNDFAIR]) |> # use an anonymouse function to be tricky
+    @vlplot(
+        :line, 
+        x = :Year,
+        y = :value,
+        color = :variable
+    )
 
 ## SEE NOTEBOOK FOR SOME MORE GRAPHICS AND QC WORK
