@@ -65,7 +65,7 @@ add_comp!(m, total_rf; after = :contrails_rf);
 add_comp!(m, temperature; after = :total_rf);
 
 # set all the FAIR component parameters and make their internal connections
-set_MimiFAIR162_params!(m)
+update_MimiFAIR162_params!(m)
 
 #-------------------------------------------------------
 # connect FUND and FAIR

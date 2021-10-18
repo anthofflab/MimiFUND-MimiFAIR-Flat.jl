@@ -57,7 +57,7 @@ add_comp!(m, total_forcing; after = :landuse_forcing);
 add_comp!(m, temperature; after = :total_forcing);
 
 # set all the FAIR component parameters and make their internal connections
-set_MimiFAIR_params!(m)
+update_MimiFAIR162_params!(m)
 
 # connect FUND and FAIR
 
@@ -70,13 +70,13 @@ set_MimiFAIR_params!(m)
 # new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
 
 add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR -- SHOULD THIS BE GTC?
+set_param!(m, :multiplier, :multiply, fill(1/1000 * 12/44, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons C going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIRv1_6_2.load_fair_data(1765, FAIR_last, "RCP85");
 
 ar6_emissions_raw = DataFrame(load(joinpath(@__DIR__, "..", "data", "model_data", "AR6_emissions_"*ar6_scenario*"_1750_2300.csv")))
-# ar6_emissions_raw = DataFrame(load(joinpath(@__DIR__, "data", "model_data", "AR6_emissions_"*ar6_scenario*"_1750_2300.csv")))
+
 # Subset AR6 emissions to proper years.
 emission_indices = indexin(collect(FAIR_first:FAIR_last), ar6_emissions_raw.Year)
 ar6_emissions = ar6_emissions_raw[emission_indices, :]
@@ -107,6 +107,14 @@ connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 run(m)
 explore(m)
 
+# graphs
+
+mfund = MimiFUND.get_model()
+run(mfund)
+
+mfair = MimiFAIR.get_model()
+run(mfair)
+
 fairvals = mfair[:temperature, :T]
 fundfairvals =  m[:temperature, :T]
 fundvals = vcat(
@@ -115,18 +123,15 @@ fundvals = vcat(
 )
 fundvals = fundvals[:,1]; # make a vector
 
-df = DataFrame(
+DataFrame(
     :Year => Mimi.time_labels(m),
     :FUND => fundvals,
     :FAIR => fairvals,
-    :FUNDFAIR => fundfairvals
-)
-
-stack(df, [:FUND, :FAIR, :FUNDFAIR]) |> 
-
-@vlplot(
-    :line, 
-    x = :Year,
-    y = :value,
-    color = :variable
-)
+    :FUNDFAIR => fundfairvals) |> 
+    i -> stack(i, [:FUND, :FAIR, :FUNDFAIR]) |> # use an anonymouse function to be tricky
+    @vlplot(
+        :line, 
+        x = :Year,
+        y = :value,
+        color = :variable
+    )
