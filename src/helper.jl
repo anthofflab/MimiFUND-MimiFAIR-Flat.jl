@@ -361,6 +361,7 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     update_param!(m, :co2_forcing, :c₁, -0.0021492)
     update_param!(m, :co2_forcing, :d₁, 5.2488)
     update_param!(m, :co2_forcing, :adjust_F2x, true)
+
     connect_param!(m, :co2_forcing => :CO₂, :co2_cycle => :co2)
     connect_param!(m, :co2_forcing => :N₂O, :n2o_cycle => :N₂O)
 
@@ -369,6 +370,7 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     update_param!(m, :ch4_forcing, :b₃, -0.00012462)
     update_param!(m, :ch4_forcing, :d₃, 0.045194)
     update_param!(m, :ch4_forcing, :h2o_from_ch4, 0.079047)
+
     connect_param!(m, :ch4_forcing => :N₂O, :n2o_cycle => :N₂O)
     connect_param!(m, :ch4_forcing => :CH₄, :ch4_cycle => :CH₄)
 
@@ -377,6 +379,7 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     update_param!(m, :n2o_forcing, :b₂,  0.00025455)
     update_param!(m, :n2o_forcing, :c₂, -0.00024357)
     update_param!(m, :n2o_forcing, :d₂, 0.12173)
+
     connect_param!(m, :n2o_forcing => :CO₂, :co2_cycle => :co2)
     connect_param!(m, :n2o_forcing => :N₂O, :n2o_cycle => :N₂O)
     connect_param!(m, :n2o_forcing => :CH₄, :ch4_cycle => :CH₄)
@@ -424,10 +427,12 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     # ---- Other Well-Mixed Greenhouse Gas Radiative Forcings ---- #
     update_param!(m, :other_ghg_forcing, :other_ghg_radiative_efficiency, gas_data[findall((in)(other_ghg_names), gas_data.gas), :rad_eff])
     update_param!(m, :other_ghg_forcing, :other_ghg_pi, gas_data[findall((in)(other_ghg_names), gas_data.gas), :pi_conc_ar6])
+
     connect_param!(m, :other_ghg_forcing => :conc_other_ghg, :other_ghg_cycles => :conc_other_ghg)
 
     # ---- Ozone-Depleting Substance Radiative Forcings ---- #
     update_param!(m, :o3_depleting_substance_forcing, :ods_radiative_efficiency, gas_data[findall((in)(ods_names), gas_data.gas), :rad_eff])
+
     connect_param!(m, :o3_depleting_substance_forcing => :conc_ods, :o3_depleting_substance_cycles => :conc_ods)
 
     # ---- Contrails Radiative Forcing ---- #
@@ -468,6 +473,7 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     update_param!(m, :total_forcing, :F_volcanic, ar6_volcanic_forcing)
     update_param!(m, :total_forcing, :F_solar, ar6_solar_forcing)
     update_param!(m, :total_forcing, :F_exogenous, zeros(length(start_year:end_year)))
+
     connect_param!(m, :total_forcing => :F_CO₂, :co2_forcing => :rf_co2)
     connect_param!(m, :total_forcing => :F_CH₄, :ch4_forcing => :rf_ch4)
     connect_param!(m, :total_forcing => :F_CH₄_H₂O, :ch4_forcing => :rf_ch4_h2o)
@@ -520,7 +526,6 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     add_shared_param!(m, :model_CO₂_pi, gas_data[gas_data.gas .== "CO2", :pi_conc_ar6][1])
     connect_param!(m, :co2_cycle,   :CO₂_pi, :model_CO₂_pi)
     connect_param!(m, :co2_forcing, :CO₂_pi, :model_CO₂_pi)
-    connect_param!(m, :o3_forcing,  :CO₂_pi, :model_CO₂_pi)
 
     # set_param!(m, :N₂O_pi, gas_data[gas_data.gas .== "N2O", :pi_conc_ar6][1])
     add_shared_param!(m, :model_N₂O_pi, gas_data[gas_data.gas .== "N2O", :pi_conc_ar6][1])
@@ -529,38 +534,38 @@ function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year
     connect_param!(m, :o3_forcing,  :N₂O_pi, :model_N₂O_pi)
 
     # set_param!(m, :ods_pi, gas_data[findall((in)(ods_names), gas_data.gas), :pi_conc_ar6])
-    add_shared_param!(m, :model_ods_pi, gas_data[findall((in)(ods_names), gas_data.gas), :pi_conc_ar6])
+    add_shared_param!(m, :model_ods_pi, gas_data[findall((in)(ods_names), gas_data.gas), :pi_conc_ar6], dims = [:ozone_depleting_substances])
     connect_param!(m, :o3_depleting_substance_forcing,  :ods_pi, :model_ods_pi)
     connect_param!(m, :o3_forcing,                      :ods_pi, :model_ods_pi)
 
     # set_param!(m, :SOx_emiss, ar6_emissions.SOx)
-    add_shared_param!(m, :model_SOx_emiss, ar6_emissions.SOx)
+    add_shared_param!(m, :model_SOx_emiss, ar6_emissions.SOx, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,      :SOx_emiss, :model_SOx_emiss)
     connect_param!(m, :aerosol_indirect_forcing,    :SOx_emiss, :model_SOx_emiss)
 
     # set_param!(m, :BC_emiss, ar6_emissions.BC)
-    add_shared_param!(m, :model_BC_emiss, ar6_emissions.BC)
+    add_shared_param!(m, :model_BC_emiss, ar6_emissions.BC, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,      :BC_emiss, :model_BC_emiss)
     connect_param!(m, :aerosol_indirect_forcing,    :BC_emiss, :model_BC_emiss)
     connect_param!(m, :bc_snow_forcing,             :BC_emiss, :model_BC_emiss)
 
     # set_param!(m, :OC_emiss, ar6_emissions.OC)
-    add_shared_param!(m, :model_OC_emiss, ar6_emissions.OC)
+    add_shared_param!(m, :model_OC_emiss, ar6_emissions.OC, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,      :OC_emiss, :model_OC_emiss)
     connect_param!(m, :aerosol_indirect_forcing,    :OC_emiss, :model_OC_emiss)
 
     # set_param!(m, :CO_emiss, ar6_emissions.CO)
-    add_shared_param!(m, :model_CO_emiss, ar6_emissions.CO)
+    add_shared_param!(m, :model_CO_emiss, ar6_emissions.CO, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,  :CO_emiss, :model_CO_emiss)
     connect_param!(m, :o3_forcing,              :CO_emiss, :model_CO_emiss)
 
     # set_param!(m, :NMVOC_emiss, ar6_emissions.NMVOC)
-    add_shared_param!(m, :model_NMVOC_emiss, ar6_emissions.NMVOC)
+    add_shared_param!(m, :model_NMVOC_emiss, ar6_emissions.NMVOC, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,  :NMVOC_emiss, :model_NMVOC_emiss)
     connect_param!(m, :o3_forcing,              :NMVOC_emiss, :model_NMVOC_emiss)
 
     # set_param!(m, :NOx_emiss, ar6_emissions.NOx)
-    add_shared_param!(m, :model_NOx_emiss, ar6_emissions.NOx)
+    add_shared_param!(m, :model_NOx_emiss, ar6_emissions.NOx, dims = [:time])
     connect_param!(m, :aerosol_direct_forcing,  :NOx_emiss, :model_NOx_emiss)
     connect_param!(m, :o3_forcing,              :NOx_emiss, :model_NOx_emiss)
     connect_param!(m, :contrails_forcing,       :NOx_emiss, :model_NOx_emiss)

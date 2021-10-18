@@ -1,11 +1,13 @@
 using MimiFAIRv1_6_2
 using MimiFUND
 using Mimi
+using DataFrames
+using VegaLite
 
 include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
 
 # set some constants
-ar6_scenario = "ssp245"
+ar6_scenario = "ssp585"
 
 FAIR_first = 1750
 FAIR_last = 2300
@@ -37,13 +39,14 @@ set_dimension!(m, :time, collect(FAIR_first:FAIR_last))
 # add the MimiFAIR components to the MimiFUND model after the emissions 
 # component, noting they will take the first and last of the model which is now
 # FAIR_first and FAIR_last
+
 add_comp!(m, ch4_cycle; after = :emissions);
 add_comp!(m, n2o_cycle; after = :ch4_cycle);
 add_comp!(m, co2_cycle; after = :n2o_cycle);
 add_comp!(m, other_ghg_cycles; after = :co2_cycle);
 add_comp!(m, o3_depleting_substance_cycles; after = :other_ghg_cycles);
 add_comp!(m, co2_forcing; after = :o3_depleting_substance_cycles);
-add_comp!(m, ch4_forcing; after = :co2_cycle);
+add_comp!(m, ch4_forcing; after = :co2_forcing);
 add_comp!(m, n2o_forcing; after = :ch4_forcing);
 add_comp!(m, o3_forcing; after = :n2o_forcing);
 add_comp!(m, aerosol_direct_forcing; after = :o3_forcing);
@@ -57,7 +60,7 @@ add_comp!(m, total_forcing; after = :landuse_forcing);
 add_comp!(m, temperature; after = :total_forcing);
 
 # set all the FAIR component parameters and make their internal connections
-update_MimiFAIR162_params!(m)
+update_MimiFAIR162_params!(m; start_year = FAIR_first, end_year = FAIR_last, ar6_scenario = ar6_scenario)
 
 # connect FUND and FAIR
 
@@ -70,14 +73,11 @@ update_MimiFAIR162_params!(m)
 # new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
 
 add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-set_param!(m, :multiplier, :multiply, fill(1/1000 * 12/44, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons C going into FAIR
+set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons C coming out of FUND to Gtons C going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
-rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIRv1_6_2.load_fair_data(1765, FAIR_last, "RCP85");
-
-ar6_emissions_raw = DataFrame(load(joinpath(@__DIR__, "..", "data", "model_data", "AR6_emissions_"*ar6_scenario*"_1750_2300.csv")))
-
 # Subset AR6 emissions to proper years.
+ar6_emissions_raw = DataFrame(load(joinpath(@__DIR__, "..", "data", "model_data", "AR6_emissions_"*ar6_scenario*"_1750_2300.csv")))
 emission_indices = indexin(collect(FAIR_first:FAIR_last), ar6_emissions_raw.Year)
 ar6_emissions = ar6_emissions_raw[emission_indices, :]
 
@@ -112,7 +112,7 @@ explore(m)
 mfund = MimiFUND.get_model()
 run(mfund)
 
-mfair = MimiFAIR.get_model()
+mfair = MimiFAIRv1_6_2.get_model(;start_year = FAIR_first, end_year = FAIR_last, ar6_scenario = ar6_scenario)
 run(mfair)
 
 fairvals = mfair[:temperature, :T]

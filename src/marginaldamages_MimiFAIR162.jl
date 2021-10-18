@@ -79,7 +79,7 @@ update_MimiFAIR162_params!(m)
 # new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
 
 add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
+set_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons C coming out of FUND to Gtons CO₂ going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIR.load_fair_data(FAIR_first, FAIR_last, rcp);
