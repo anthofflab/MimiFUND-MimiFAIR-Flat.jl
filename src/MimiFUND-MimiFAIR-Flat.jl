@@ -1,6 +1,8 @@
 using MimiFAIR
 using MimiFUND
 using Mimi
+using VegaLite
+using DataFrames
 
 include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
 
@@ -99,7 +101,14 @@ connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 run(m)
 explore(m)
 
-# graph temperature
+# graphs
+
+mfund = MimiFUND.get_model()
+run(mfund)
+
+mfair = MimiFAIR.get_model()
+run(mfair)
+
 fairvals = mfair[:temperature, :T]
 fundfairvals =  m[:temperature, :T]
 fundvals = vcat(
