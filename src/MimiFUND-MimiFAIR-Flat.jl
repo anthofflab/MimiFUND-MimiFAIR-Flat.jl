@@ -1,8 +1,10 @@
 using MimiFAIR
 using MimiFUND
 using Mimi
+using VegaLite
+using DataFrames
 
-include("helper.jl")
+include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
 
 # set some constants
 rcp = "RCP85"
@@ -69,7 +71,7 @@ update_MimiFAIR_params!(m)
 # new source: FUND :emissions variable :mco2 (which first runs through a multiplier component)
 
 add_comp!(m, Mimi.multiplier; after = :emissions, first = FUND_first, last = FUND_last);
-update_param!(m, :multiplier, :multiply, fill(1/1000, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons CO₂ going into FAIR
+update_param!(m, :multiplier, :multiply, fill(1/1000 * 12/44, FAIR_len)) # convert Mtons CO₂ coming out of FUND to Gtons C going into FAIR
 connect_param!(m, :multiplier, :input, :emissions, :mco2)
 
 rcp_emissions, volcano_forcing, solar_forcing, gas_data, gas_fractions, conversions = MimiFAIR.load_fair_data(FAIR_first, FAIR_last, rcp);
@@ -98,5 +100,34 @@ connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 
 run(m)
 explore(m)
+
+# graphs
+
+mfund = MimiFUND.get_model()
+run(mfund)
+
+mfair = MimiFAIR.get_model()
+run(mfair)
+
+fairvals = mfair[:temperature, :T]
+fundfairvals =  m[:temperature, :T]
+fundvals = vcat(
+    fill(missing, length(FAIR_first:FUND_first)-1),
+    mfund[:climateco2cycle, :temp][1:length(FUND_first:FAIR_last),:]
+)
+fundvals = fundvals[:,1]; # make a vector
+
+DataFrame(
+    :Year => Mimi.time_labels(m),
+    :FUND => fundvals,
+    :FAIR => fairvals,
+    :FUNDFAIR => fundfairvals) |> 
+    i -> stack(i, [:FUND, :FAIR, :FUNDFAIR]) |> # use an anonymouse function to be tricky
+    @vlplot(
+        :line, 
+        x = :Year,
+        y = :value,
+        color = :variable
+    )
 
 ## SEE NOTEBOOK FOR SOME MORE GRAPHICS AND QC WORK
