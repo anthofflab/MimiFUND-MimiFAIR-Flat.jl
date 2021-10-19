@@ -1,0 +1,7 @@
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Mimi = "e4e893b0-ee5e-52ea-8111-44b3bdec128c"
+MimiFAIRv1_6_2 = "02cc1f66-ff46-4bd7-a247-ac068822e639"
+MimiFUND = "b3ba11de-429f-11e9-29f7-cb478ab96e7c"
+VegaLite = "112f6efa-9a02-5b7d-90c0-432ed331239a"
