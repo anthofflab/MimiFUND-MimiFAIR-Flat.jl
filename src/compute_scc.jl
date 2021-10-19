@@ -36,7 +36,7 @@ end
 scghg_dict
 
 
-## save
-using CSV # sorry david
-path = "C:/Users/TTAN/Environmental Protection Agency (EPA)/NCEE Social Cost of Carbon - General/models/Notes/Code/output/fair1.6"
-CSV.write(joinpath(path,"fund39_fair16_scghgs.csv"), scghg_dict)
+# ## save
+# using CSV # sorry david
+# path = "C:/Users/TTAN/Environmental Protection Agency (EPA)/NCEE Social Cost of Carbon - General/models/Notes/Code/output/fair1.6"
+# CSV.write(joinpath(path,"fund39_fair16_scghgs.csv"), scghg_dict)
