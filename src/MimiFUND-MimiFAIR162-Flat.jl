@@ -1,22 +1,12 @@
-using MimiFAIRv1_6_2
+using MimiFAIRv1_6_2 # imports the model and its components, as referenced by MimiFAIRv1_6_2.component_name
 using MimiFUND
 using Mimi
 using DataFrames
 using VegaLite
 
 include(joinpath(@__DIR__, "helper.jl")) # path relative to this file
-# include(joinpath(@__DIR__, "src/helper.jl"))
 
-include(joinpath(@__DIR__, "marginaldamages_MimiFAIR162.jl")) # path relative to this file
-# include(joinpath(@__DIR__, "src/marginaldamages_MimiFAIR162.jl"))
-
-# import MimiFAIRv1_6_2 components 
-import MimiFAIRv1_6_2: ch4_cycle, n2o_cycle, other_ghg_cycles, co2_cycle, ch4_forcing, o3_forcing,
-n2o_forcing, other_ghg_forcing, other_ghg_cycles, co2_forcing, o3_depleting_substance_cycles, o3_depleting_substance_forcing, aerosol_direct_forcing, 
-aerosol_indirect_forcing, bc_snow_forcing, landuse_forcing, contrails_forcing, total_forcing, temperature 
-
-
-function get_fundfair16(;ar6_scenario::String = "ssp245",
+function get_fundfair162(;ar6_scenario::String = "ssp245",
                             FAIR_first = 1750,
                             FAIR_last = 2300,
                             FUND_first = 1950,
@@ -43,24 +33,24 @@ function get_fundfair16(;ar6_scenario::String = "ssp245",
     # component, noting they will take the first and last of the model which is now
     # FAIR_first and FAIR_last
 
-    add_comp!(m, ch4_cycle; after = :emissions);
-    add_comp!(m, n2o_cycle; after = :ch4_cycle);
-    add_comp!(m, co2_cycle; after = :n2o_cycle);
-    add_comp!(m, other_ghg_cycles; after = :co2_cycle);
-    add_comp!(m, o3_depleting_substance_cycles; after = :other_ghg_cycles);
-    add_comp!(m, co2_forcing; after = :o3_depleting_substance_cycles);
-    add_comp!(m, ch4_forcing; after = :co2_forcing);
-    add_comp!(m, n2o_forcing; after = :ch4_forcing);
-    add_comp!(m, o3_forcing; after = :n2o_forcing);
-    add_comp!(m, aerosol_direct_forcing; after = :o3_forcing);
-    add_comp!(m, aerosol_indirect_forcing; after = :aerosol_direct_forcing);
-    add_comp!(m, other_ghg_forcing; after = :aerosol_indirect_forcing);
-    add_comp!(m, o3_depleting_substance_forcing; after = :other_ghg_forcing);
-    add_comp!(m, contrails_forcing; after = :o3_depleting_substance_forcing);
-    add_comp!(m, bc_snow_forcing; after = :contrails_forcing);
-    add_comp!(m, landuse_forcing; after = :bc_snow_forcing);
-    add_comp!(m, total_forcing; after = :landuse_forcing);
-    add_comp!(m, temperature; after = :total_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.ch4_cycle; after = :emissions);
+    add_comp!(m, MimiFAIRv1_6_2.n2o_cycle; after = :ch4_cycle);
+    add_comp!(m, MimiFAIRv1_6_2.co2_cycle; after = :n2o_cycle);
+    add_comp!(m, MimiFAIRv1_6_2.other_ghg_cycles; after = :co2_cycle);
+    add_comp!(m, MimiFAIRv1_6_2.o3_depleting_substance_cycles; after = :other_ghg_cycles);
+    add_comp!(m, MimiFAIRv1_6_2.co2_forcing; after = :o3_depleting_substance_cycles);
+    add_comp!(m, MimiFAIRv1_6_2.ch4_forcing; after = :co2_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.n2o_forcing; after = :ch4_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.o3_forcing; after = :n2o_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.aerosol_direct_forcing; after = :o3_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.aerosol_indirect_forcing; after = :aerosol_direct_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.other_ghg_forcing; after = :aerosol_indirect_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.o3_depleting_substance_forcing; after = :other_ghg_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.contrails_forcing; after = :o3_depleting_substance_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.bc_snow_forcing; after = :contrails_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.landuse_forcing; after = :bc_snow_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.total_forcing; after = :landuse_forcing);
+    add_comp!(m, MimiFAIRv1_6_2.temperature; after = :total_forcing);
 
     # set all the FAIR component parameters and make their internal connections
     update_MimiFAIR162_params!(m; start_year = FAIR_first, end_year = FAIR_last, ar6_scenario = ar6_scenario)
@@ -88,6 +78,12 @@ function get_fundfair16(;ar6_scenario::String = "ssp245",
     FAIR_CO₂_backup = (ar6_emissions.FossilCO2 .+ ar6_emissions.OtherCO2)
     connect_param!(m, :co2_cycle, :E_co2, :multiplier, :output, FAIR_CO₂_backup, backup_offset = 1)
 
+    # A note here is that FAIR v1.6.2 splits land use CO2 emissions and fossil CO2 emission, and feeds 
+    # their sum into the `co2_cycle`, but just the land use emissions into the `landuse_forcing` 
+    # component in MimiFAIRv1_6_2. Given FUND does not explicilty provide the land use emissions 
+    # (AFOLU), we do not modify the latter connection, and thus FAIR will run with its default 
+    # land use emissions for the `landuse_forcing` component.
+
     #
     # FAIR Temperature --> FUND CO₂ Cycle, Biodiversity, Ocean and Regional Climate Components
     #
@@ -104,12 +100,6 @@ function get_fundfair16(;ar6_scenario::String = "ssp245",
     # new source: FAIR component :temperature --> variable :T
     connect_param!(m, :climateregional, :inputtemp, :temperature, :T)
 
-    ##
-    ## Step 5. Run and Explore
-    ##
-
-    run(m)
-
-    return(m)
+    return m
 
 end
