@@ -2,6 +2,22 @@ using Mimi
 using DataFrames
 using CSVFiles
 
+"""
+    update_MimiFAIR_params!(m; 
+                            rcp_scenario::String="RCP85", 
+                            start_year::Int=1765, 
+                            end_year::Int=2500, 
+                            F2x::Float64=3.71, 
+                            TCR::Float64=1.6, 
+                            ECS::Float64=2.75, 
+                            d::Array{Float64,1}=[239.0, 4.1])
+
+Update all parameter settings in the model `m` with default FAIR settings as pulled
+from the MimiFAIR repository.  Optional arguments include `rcp_scenario` to indicate
+what scenario to use, `start_year` and `end_year` to indicate the model time dimension,
+and three parameter settings for the paramters `F2x`, `TCR`, and `ECS`.  See the
+MimiFAIR model documentatoin for more.
+"""
 function update_MimiFAIR_params!(m; rcp_scenario::String="RCP85", start_year::Int=1765, end_year::Int=2500, F2x::Float64=3.71, TCR::Float64=1.6, ECS::Float64=2.75, d::Array{Float64,1}=[239.0, 4.1])
     
     # ---------------------------------------------
@@ -107,8 +123,6 @@ function update_MimiFAIR_params!(m; rcp_scenario::String="RCP85", start_year::In
     update_param!(m, :aerosol_direct_rf, :CO_emiss, rcp_emissions.CO)
     update_param!(m, :aerosol_direct_rf, :NMVOC_emiss, rcp_emissions.NMVOC)
     update_param!(m, :aerosol_direct_rf, :NH3_emiss, rcp_emissions.NH3)
-    # set_param!(m, :NH3_emiss, ar6_emissions.NH3)
-    add_shared_param!(m, :model_NH3_emiss, ar6_emissions.NH3)
 
     # ---- Aerosol Indirect Radiative Forcing ---- #
     update_param!(m, :aerosol_indirect_rf, :ϕ, -1.95011431)
@@ -249,6 +263,13 @@ function update_MimiFAIR_params!(m; rcp_scenario::String="RCP85", start_year::In
     connect_param!(m, :temperature, :F, :total_rf, :total_forcing)
 end
 
+"""
+    update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year::Int=1750, end_year::Int=2300)
+
+Update all parameter settings in the model `m` with default FAIR  v1.2.6 settings 
+as pulled from the MimiFAIRv1_6_2 repository.  Optional arguments include `ar6_scenario` to indicate
+what scenario to use, `start_year` and `end_year` to indicate the model time dimension.
+"""
 function update_MimiFAIR162_params!(m; ar6_scenario::String="ssp245", start_year::Int=1750, end_year::Int=2300)
     
     # ---------------------------------------------

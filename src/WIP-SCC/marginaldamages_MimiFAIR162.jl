@@ -12,7 +12,7 @@
     end
 end
 
-function create_marginal_fundfair16_model(m; year::Int64, pulse_size = 1e7, gas::Symbol = :CO2)
+function create_marginal_fundfair162_model(m; year::Int64, pulse_size = 1e7, gas::Symbol = :CO2)
 
     if gas == :CO2
         
@@ -68,7 +68,7 @@ function create_marginal_fundfair16_model(m; year::Int64, pulse_size = 1e7, gas:
 end
 
 
-function compute_fundfair16_sc(mm; rate::Float64, year::Int64, start_year::Int64 = 1750, end_year::Int64 = 2300)
+function compute_fundfair162_sc(mm; rate::Float64, year::Int64, start_year::Int64 = 1750, end_year::Int64 = 2300)
     
     marginaldamage = mm[:impactaggregation, :loss]
 
