@@ -23,9 +23,9 @@ version = "0.1.0"
 
 [[ArrayInterface]]
 deps = ["Compat", "IfElse", "LinearAlgebra", "Requires", "SparseArrays", "Static"]
-git-tree-sha1 = "b8d49c34c3da35f220e7295659cd0bab8e739fed"
+git-tree-sha1 = "1d6835607e9f214cb4210310868f8cf07eb0facc"
 uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
-version = "3.1.33"
+version = "3.1.34"
 
 [[Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -187,9 +187,9 @@ version = "1.3.1"
 
 [[Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
-git-tree-sha1 = "9f46deb4d4ee4494ffb5a40a27a2aced67bdd838"
+git-tree-sha1 = "09d9eaef9ef719d2cd5d928a191dc95be2ec8059"
 uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.4"
+version = "0.10.5"
 
 [[Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -686,8 +686,8 @@ uuid = "73d86c50-c5fa-11e9-3497-c3dc913e627a"
 version = "1.0.2"
 
 [[MimiFAIRv1_6_2]]
-deps = ["CSVFiles", "DataFrames", "JSON", "Mimi"]
-git-tree-sha1 = "dce205d064c8e5d2900a9bb738934f243e4f9958"
+deps = ["CSVFiles", "DataFrames", "Dates", "Distributions", "JSON", "Mimi"]
+git-tree-sha1 = "f5bff8883b651f8c77c0e47205d366c8d63d37d3"
 repo-rev = "main"
 repo-url = "https://github.com/FrankErrickson/MimiFAIRv1_6_2.jl.git"
 uuid = "02cc1f66-ff46-4bd7-a247-ac068822e639"
